@@ -9,6 +9,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { BookerLayouts } from "@calcom/prisma/zod-utils";
 import { Button, ButtonGroup, Icon, ToggleGroup, Tooltip } from "@calcom/ui";
 
+import { gregorianToJalali } from "../../../../jalali-date";
 import { TimeFormatToggle } from "../../components/TimeFormatToggle";
 import { useBookerStore } from "../store";
 import type { BookerLayout } from "../types";
@@ -101,10 +102,29 @@ export function Header({
     );
   };
 
+  const FormattedSelectedDateRangeJalali = () => {
+    const [jyStart, jmStart, jdStart] = gregorianToJalali(
+      selectedDate.year(),
+      selectedDate.month() + 1,
+      selectedDate.date()
+    );
+    const [jyEnd, jmEnd, jdEnd] = gregorianToJalali(endDate.year(), endDate.month() + 1, endDate.date());
+
+    const jalaliStart = `${jyStart}/${jmStart}/${jdStart}`;
+    const jalaliEnd = `${jyEnd}/${jmEnd}/${jdEnd}`;
+
+    return (
+      <h3 className="min-w-[150px] text-base font-semibold leading-4">
+        {jalaliStart} - {jalaliEnd}
+      </h3>
+    );
+  };
+
   return (
     <div className="border-default relative z-10 flex border-b px-5 py-4 ltr:border-l rtl:border-r">
       <div className="flex items-center gap-5 rtl:flex-grow">
-        <FormattedSelectedDateRange />
+        {/* <FormattedSelectedDateRange /> */}
+        <FormattedSelectedDateRangeJalali />
         <ButtonGroup>
           <Button
             className="group rtl:ml-1 rtl:rotate-180"

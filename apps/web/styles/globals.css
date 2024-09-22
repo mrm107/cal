@@ -483,3 +483,19 @@ select:focus {
 .intercom-lightweight-app  {
   @apply z-40 !important;
 }
+
+
+@font-face {
+  font-family: VazirFD;
+  src: url("../public/fonts/Vazir\ FD/Vazir-FD.ttf");
+}
+
+html[lang=fa] {
+  font-family: VazirFD !important;
+}
+
+
+html[lang=fa] .font-cal {
+  font-family: VazirFD !important;
+}
+

@@ -3,7 +3,7 @@ const path = require("path");
 /** @type {import("next-i18next").UserConfig} */
 const config = {
   i18n: {
-    defaultLocale: "en",
+    defaultLocale: "fa",
     locales: [
       "ar",
       "cs",
@@ -14,6 +14,7 @@ const config = {
       "es",
       "et",
       "fr",
+      "fa",
       "he",
       "hu",
       "it",

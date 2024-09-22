@@ -10,6 +10,7 @@ import "@calcom/dayjs/locales";
 import ViewRecordingsDialog from "@calcom/features/ee/video/ViewRecordingsDialog";
 import classNames from "@calcom/lib/classNames";
 import { formatTime } from "@calcom/lib/date-fns";
+import { formatToLocalizedDate } from "@calcom/lib/date-fns";
 import getPaymentAppData from "@calcom/lib/getPaymentAppData";
 import { useCopy } from "@calcom/lib/hooks/useCopy";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
@@ -267,6 +268,8 @@ function BookingListItem(booking: BookingItemProps) {
     );
   };
 
+  const localizedStartDate = dayjs(booking.startTime).tz(userTimeZone).locale(language);
+
   const startTime = dayjs(booking.startTime)
     .tz(userTimeZone)
     .locale(language)
@@ -437,7 +440,10 @@ function BookingListItem(booking: BookingItemProps) {
             {eventTypeColor && <div className="h-[70%] w-0.5" style={{ backgroundColor: eventTypeColor }} />}
             <Link href={bookingLink} className="ml-3">
               <div className="cursor-pointer py-4">
-                <div className="text-emphasis text-sm leading-6">{startTime}</div>
+                {/* <div className="text-emphasis text-sm leading-6">{startTime}</div> */}
+                <div className="text-emphasis text-sm leading-6">
+                  {formatToLocalizedDate(localizedStartDate, language, "full", userTimeZone)}
+                </div>
                 <div className="text-subtle text-sm">
                   {formatTime(booking.startTime, userTimeFormat, userTimeZone)} -{" "}
                   {formatTime(booking.endTime, userTimeFormat, userTimeZone)}

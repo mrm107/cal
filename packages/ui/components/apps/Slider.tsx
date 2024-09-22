@@ -51,7 +51,7 @@ export const Slider = <T extends string | unknown>({
   }, [options]);
 
   return (
-    <div className={`mb-2 ${className}`}>
+    <div className={`mb-2 ${className}`} dir="ltr">
       <div className="glide" ref={glide}>
         <div className="flex cursor-default items-center pb-3">
           {isLocaleReady ? (

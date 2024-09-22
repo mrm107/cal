@@ -13,6 +13,8 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { weekdayNames } from "@calcom/lib/weekday";
 import { Button, SkeletonText } from "@calcom/ui";
 
+import { gregorianToJalali } from "../../jalali-date";
+
 export type DatePickerProps = {
   /** which day of the week to render the calendar. Usually Sunday (=0) or Monday (=1) - default: Sunday */
   weekStart?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -95,8 +97,9 @@ export const Day = ({
       data-disabled={disabled}
       disabled={disabled}
       {...props}>
-      {away && <span data-testid="away-emoji">{emoji}</span>}
-      {!away && date.date()}
+      {/* Convert to Jalali */}
+      {!away && gregorianToJalali(date.year(), date.month() + 1, date.date())[2]}
+
       {date.isToday() && (
         <span
           className={classNames(
@@ -319,11 +322,26 @@ const DatePicker = ({
       onMonthChange(browsingDate.add(newMonth, "month"));
     }
   };
-  const month = browsingDate
-    ? new Intl.DateTimeFormat(i18n.language, { month: "long" }).format(
-        new Date(browsingDate.year(), browsingDate.month())
-      )
-    : null;
+  const [jalaliYear, jalaliMonth, jalaliDay] = gregorianToJalali(
+    browsingDate.year(),
+    browsingDate.month() + 1,
+    browsingDate.date()
+  );
+  const monthNames = [
+    "فروردین",
+    "اردیبهشت",
+    "خرداد",
+    "تیر",
+    "مرداد",
+    "شهریور",
+    "مهر",
+    "آبان",
+    "آذر",
+    "دی",
+    "بهمن",
+    "اسفند",
+  ];
+  const month = monthNames[jalaliMonth - 1];
 
   return (
     <div className={className}>
@@ -336,7 +354,8 @@ const DatePicker = ({
                 {month}
               </strong>{" "}
               <span className={classNames(`text-subtle font-medium`, customClassNames?.datePickerTitle)}>
-                {browsingDate.format("YYYY")}
+                {/* {browsingDate.format("YYYY")} */}
+                {jalaliYear}
               </span>
             </>
           ) : (

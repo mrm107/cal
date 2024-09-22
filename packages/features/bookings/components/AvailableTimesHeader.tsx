@@ -7,6 +7,7 @@ import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { nameOfDay } from "@calcom/lib/weekday";
 import { BookerLayouts } from "@calcom/prisma/zod-utils";
 
+import { gregorianToJalali } from "../../../jalali-date";
 import { useBookerStore } from "../Booker/store";
 import { TimeFormatToggle } from "./TimeFormatToggle";
 
@@ -32,6 +33,10 @@ export const AvailableTimesHeader = ({
   const isColumnView = layout === BookerLayouts.COLUMN_VIEW;
   const isMonthView = layout === BookerLayouts.MONTH_VIEW;
   const isToday = dayjs().isSame(date, "day");
+
+  // Convert date to Jalali
+  const [jy, jm, jd] = gregorianToJalali(date.year(), date.month() + 1, date.date());
+  const jalaliDate = `${jy}/${jm}/${jd}`;
 
   return (
     <header
@@ -60,8 +65,9 @@ export const AvailableTimesHeader = ({
               ? `text-default text-sm ${customClassNames?.availableTimeSlotsTitle}`
               : `text-xs ${customClassNames?.availableTimeSlotsTitle}`
           )}>
-          {date.format("DD")}
-          {availableMonth && `, ${availableMonth}`}
+          {/* {date.format("DD")} */}
+          {jalaliDate}
+          {/* {availableMonth && `, ${availableMonth}`} */}
         </span>
       </span>
 
