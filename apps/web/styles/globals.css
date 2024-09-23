@@ -499,3 +499,26 @@ html[lang=fa] .font-cal {
   font-family: VazirFD !important;
 }
 
+
+html[lang=fa] [data-testid="publish-button"] svg,
+html[lang=fa] [data-testid="view_next_month"] svg,
+html[lang=fa] [data-testid="go-back-button"] svg
+{
+  transform: rotate(180deg);
+}
+
+
+html[lang=fa] div.ml-auto:has([data-testid="chevron-right"]) {
+  margin-right: auto;
+  margin-left: 0 !important;
+  transform: rotate(180deg);
+}
+
+html[lang=fa] [data-radix-menu-content] {
+  direction: rtl;
+}
+
+html[lang=fa] [data-radix-menu-content] [data-radix-collection-item] a > div,
+html[lang=fa] [data-radix-menu-content] [data-radix-collection-item] button > div {
+  margin-right: 1rem !important;
+}
