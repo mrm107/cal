@@ -1,3 +1,4 @@
+import jalaali from "jalaali-js";
 import { useEffect } from "react";
 import { shallow } from "zustand/shallow";
 
@@ -8,12 +9,25 @@ import { useEmbedStyles } from "@calcom/embed-core/embed-iframe";
 import { useBookerStore } from "@calcom/features/bookings/Booker/store";
 import { getAvailableDatesInMonth } from "@calcom/features/calendars/lib/getAvailableDatesInMonth";
 import classNames from "@calcom/lib/classNames";
-import { daysInMonth, yyyymmdd } from "@calcom/lib/date-fns";
+import { yyyymmdd } from "@calcom/lib/date-fns";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 import { weekdayNames } from "@calcom/lib/weekday";
 import { Button, SkeletonText } from "@calcom/ui";
 
 import { gregorianToJalali } from "../../jalali-date";
+
+interface GregorianDateObject {
+  $y: number; // Year
+  $M: number; // Month (0-indexed for JS)
+  $D: number; // Day
+  $d: Date; // JavaScript Date object
+  $L: string; // Locale
+  $H: number; // Hour
+  $m: number; // Minutes
+  $s: number; // Seconds
+  $ms: number; // Milliseconds
+  $u?: undefined; // Undefined
+}
 
 export type DatePickerProps = {
   /** which day of the week to render the calendar. Usually Sunday (=0) or Monday (=1) - default: Sunday */
@@ -160,19 +174,121 @@ const Days = ({
   isBookingInPast: boolean;
 }) => {
   // Create placeholder elements for empty days in first week
-  const weekdayOfFirst = browsingDate.date(1).day();
+  // const weekdayOfFirst = browsingDate.date(1).day();
 
-  const includedDates = getAvailableDatesInMonth({
-    browsingDate: browsingDate.toDate(),
+  function getPreviousStartAndNextEndDates(dateString: Date) {
+    const date = dayjs(dateString);
+
+    // Get the previous month's start date
+    const previousMonthStart = date.subtract(1, "month").startOf("month");
+
+    // Get the next month's end date
+    const nextMonthEnd = date.add(1, "month").endOf("month");
+
+    return {
+      previousMonthStart: previousMonthStart,
+      nextMonthEnd: nextMonthEnd,
+    };
+  }
+
+  const result = getPreviousStartAndNextEndDates(browsingDate.toDate());
+
+  const a = getAvailableDatesInMonth({
+    browsingDate: result.previousMonthStart.toDate(),
     minDate,
     includedDates: props.includedDates,
   });
 
+  const b = getAvailableDatesInMonth({
+    browsingDate: browsingDate.toDate(),
+    minDate,
+    includedDates: props.includedDates,
+  });
+  const c = getAvailableDatesInMonth({
+    browsingDate: result.nextMonthEnd.toDate(),
+    minDate,
+    includedDates: props.includedDates,
+  });
+
+  const includedDates = [...a, ...b, ...c];
+  // const includedDates = getAvailableDatesInMonth({
+  //   browsingDate: browsingDate.toDate(),
+  //   minDate,
+  //   includedDates: props.includedDates,
+  // });
+  console.log(includedDates);
+  console.log(browsingDate.toDate());
+
+  const convertToJalali = (browsingDate: any) => {
+    // Extract the year, month, and day from the browsingDate variable
+    const year = browsingDate.$y;
+    const month = browsingDate.$M + 1; // months are 0-indexed in JavaScript Date
+    const day = browsingDate.$D;
+
+    // Convert Gregorian date to Jalali
+    const jalaliDate = jalaali.toJalaali(year, month, day);
+
+    return jalaliDate;
+  };
+
+  const getGregorianDatesForJalaliMonth = (
+    jalaliYear: number,
+    jalaliMonth: number
+  ): GregorianDateObject[] => {
+    // Step 1: Get the number of days in the given Jalali month
+    const daysInMonth = jalaali.jalaaliMonthLength(jalaliYear, jalaliMonth);
+
+    // Step 2: Initialize an array to store the Gregorian dates
+    const gregorianDates: GregorianDateObject[] = [];
+
+    // Step 3: Loop through all days of the Jalali month
+    for (let day = 1; day <= daysInMonth; day++) {
+      // Convert each Jalali date to Gregorian
+      const gregorianDate = jalaali.toGregorian(jalaliYear, jalaliMonth, day);
+
+      // Step 4: Create a JavaScript Date object
+      const date = new Date(gregorianDate.gy, gregorianDate.gm - 1, gregorianDate.gd);
+
+      // Step 5: Create an object similar to what you expect
+      const dateObject: GregorianDateObject = {
+        $y: gregorianDate.gy, // Year
+        $M: gregorianDate.gm - 1, // Month (0-indexed for JS)
+        $D: gregorianDate.gd, // Day
+        $d: date, // Set $d as the JavaScript Date object directly
+        $L: "en", // Locale (set to "en")
+        $H: 0, // Hour (set to 0)
+        $m: 0, // Minutes (set to 0)
+        $s: 0, // Seconds (set to 0)
+        $ms: 0, // Milliseconds (set to 0)
+        $u: undefined, // Undefined
+      };
+
+      // Push the object to the array
+      gregorianDates.push(dateObject);
+    }
+
+    // Step 6: Return the array of date objects
+    return gregorianDates;
+  };
+
+  const jalaliBrowsingDate = convertToJalali(browsingDate);
+  const gregorianDates = getGregorianDatesForJalaliMonth(jalaliBrowsingDate.jy, jalaliBrowsingDate.jm);
+
+  // const days: (Dayjs | null)[] = Array((weekdayOfFirst - weekStart + 7) % 7).fill(null);
+  // for (let day = 1, dayCount = daysInMonth(browsingDate); day <= dayCount; day++) {
+  //   const date = browsingDate.set("date", day);
+  //   days.push(date);
+  // }
+
+  const weekdayOfFirst = dayjs(
+    new Date(gregorianDates[0].$y, gregorianDates[0].$M, gregorianDates[0].$D)
+  ).day();
   const days: (Dayjs | null)[] = Array((weekdayOfFirst - weekStart + 7) % 7).fill(null);
-  for (let day = 1, dayCount = daysInMonth(browsingDate); day <= dayCount; day++) {
-    const date = browsingDate.set("date", day);
-    days.push(date);
-  }
+
+  gregorianDates.forEach((dateObject, index) => {
+    const dateInDayjsFormat = dayjs(new Date(dateObject.$y, dateObject.$M, dateObject.$D));
+    days.push(dateInDayjsFormat);
+  });
 
   const [selectedDatesAndTimes] = useBookerStore((state) => [state.selectedDatesAndTimes], shallow);
 
@@ -342,7 +458,6 @@ const DatePicker = ({
     "اسفند",
   ];
   const month = monthNames[jalaliMonth - 1];
-
   return (
     <div className={className}>
       <div className="mb-1 flex items-center justify-between text-xl">

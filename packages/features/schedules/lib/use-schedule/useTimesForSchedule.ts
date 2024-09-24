@@ -34,7 +34,9 @@ export const useTimesForSchedule = ({
       endTime = monthDayjs.startOf("month").add(dayCount, "day").toISOString();
     }
   } else {
-    startTime = monthDayjs.startOf("month").toISOString();
+    startTime = dayjs().subtract(1, "month").startOf("month").toISOString();
+    // endTime = dayjs().add(2, "month").endOf("month").toISOString();
+    // startTime = monthDayjs.startOf("month").toISOString();
     endTime = (prefetchNextMonth ? nextMonthDayjs : monthDayjs).endOf("month").toISOString();
   }
   return [startTime, endTime];

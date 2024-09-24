@@ -19447,6 +19447,7 @@ __metadata:
     eslint: ^8.34.0
     husky: ^8.0.0
     i18n-unused: ^0.13.0
+    jalaali-js: ^1.2.7
     jest-diff: ^29.5.0
     jest-summarizing-reporter: ^1.1.4
     jsdom: ^22.0.0
@@ -28827,6 +28828,13 @@ __metadata:
   bin:
     jake: bin/cli.js
   checksum: a23fd2273fb13f0d0d845502d02c791fd55ef5c6a2d207df72f72d8e1eac6d2b8ffa6caf660bc8006b3242e0daaa88a3ecc600194d72b5c6016ad56e9cd43553
+  languageName: node
+  linkType: hard
+
+"jalaali-js@npm:^1.2.7":
+  version: 1.2.7
+  resolution: "jalaali-js@npm:1.2.7"
+  checksum: 4163ada3fdcc114eb68bc6fe86141aedfb63dc5fa8147c3ea4ad5f72a10b4f42cbc6b010833b7d09dc8ce5b76531b6e2c840bc8f33caf0429f261bdefb24c4e0
   languageName: node
   linkType: hard
 
